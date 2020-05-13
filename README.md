@@ -14,115 +14,95 @@ There are two inputs in my program. First one is the regular expression that use
 
 Algorithm itself consists of several parts. In the first phase we separate characters into a groups of tokens. There are two type of tokens: letter which stands for input alphabet and symbol which represents special symbols used to describe regular expression. Each token has two fields: name and value. Scanner scans through a given regular expression and every time it&#39;s required it returns the next token on the input. Main part of this phase is Parser which creates token table that represents given regexp. This part is crucial because NFA and DFA will be constructed based on this table. Phase two creates the NFA using appropriate constructors defined in NFA\_constructor class. The last part of this algorithm is to create DFA form a given ε-NFA which we do by defining ε-closure and move function. In the end we validate our input string with walk() function to check if given regexp is accepting our input string.
 
-# Program Architecture
-
-![](RackMultipart20200513-4-1gvp23x_html_13f2c633b2ff160d.png)
-
-As mentioned above program is constructed in 3 layers. Each table represents different class.
-
 Parsing
 
-| Token |
+| _Name - Name of the token eg. CHAR or LEFT\_PAREN_ |
 | --- |
-| _name_ | _Name of the token eg. CHAR or LEFT\_PAREN_ |
-| _value_ | _Value of the token eg. a or (_ |
-| **\_\_init\_\_** | **Init method** |
-| **\_\_str\_\_** | **Conjunction of name and value of a token eg. CHAR: a** |
+| _Value -_ _Value of the token eg. a or (_ |
+| **\_\_init\_\_ - Init method** |
+| **\_\_str\_\_ - Conjunction of name and value of a token eg. CHAR: a** |
 
 | Scanner |
 | --- |
-| _regexp_ | _Holds the input pattern of the regular expression_ |
-| _symbols_ | _Symbol table defined for regular expressions_ |
-| _current_ | _Points to current position in regexp_ |
-| _length_ | _Total length of regular expression_ |
-| _alphabet_ | _Defined alphabet of input words and regexps_ |
-| **get\_token** | **Returns next token in line** |
-| **show\_pattern** | **Presents regular expression** |
+| _Regexp -- Holds the input pattern of the regular expression_ |
+| _Symbols - Symbol table defined for regular expressions_ |
+| _Current - Points to current position in regexp_ |
+| _Length - Total length of regular expression_ |
+| _Alphabet - Defined alphabet of input words and regexps_ |
+| **get\_token - Returns next token in line** |
+| **show\_pattern - Presents regular expression** |
 
 | Parser |
 | --- |
-| _scanner_ | _Holds the scanner that have regular expression_ |
-| _token\_list_ | _Stores created list of tokens form scanner&#39;s regexp_ |
-| _lookahead\_pointer_ | _Points to the next regex_ |
-| **\_\_init\_\_(scanner)** | **Initialize class and set lookahead pointer to first char in regexp using get\_token method** |
-| **shift(name)** | **Takes the supposed name of the token and sets lookahead pointer to next in line** |
-| **parse** | **Starts the &quot;recursion&quot; of the algorithm that creates token list and returns it** |
-| **check\_union** | **Checks if the union is present. If so then memoraize it and dive deeper into regexp** |
-| **check\_concat** | **Checks if characters are concatenated** |
-| **check\_closure** | **Checks for Kleen&#39;s closure** |
-| **check\_char** | **Searches for letter or left parentheesis** |
-| **show\_token\_list** | **Prints token list** |
+| _Scanner - Holds the scanner that have regular expression_ |
+| _token\_list - Stores created list of tokens form scanner&#39;s regexp_ |
+| _lookahead\_pointer - Points to the next regex_ |
+| **\_\_init\_\_(scanner) - Initialize class and set lookahead pointer to first char in regexp using get\_token method** |
+| **shift(name) - Takes the supposed name of the token and sets lookahead pointer to next in line** |
+| **Parse - Starts the &quot;recursion&quot; of the algorithm that creates token list and returns it** |
+| **check\_union - Checks if the union is present. If so then memoraize it and dive deeper into regexp** |
+| **check\_concat - Checks if characters are concatenated** |
+| **check\_closure - Checks for Kleen&#39;s closure** |
+| **check\_char - Searches for letter or left parentheesis** |
+| **show\_token\_list - Prints token list** |
 
 It&#39;s worth explaining here how the parser structure works. If we want to begging parsing process we have to call parse() function. It starts the entire cycle of creating token list in something similar to Reverse Polish Notation. Firstly diving down into functions the character or parenthesis is checked. If found then we add it to token list. First return from the check\_char function looks for kleen&#39;s closure appering after the character or right parenthesis. If found then we add it after character in token list if not then we proceed with return. Next one in line is concatenation. Last thing we look for is union character. If we won&#39;t find any of the mentioned above we return the token list. If we find some appropriate symbol we start our dive again.
 
 ε-NFA
 
 | NFA State |
- |
-| --- | --- |
-| _epsilon closure_ | _List of state that have epsilon transition_ |
- |
-| _transition table_ | _Dictionary with key being letter and value is nfa state_ |
- |
-| _name_ | _Name of the state eg. s2_ |
- |
-| _is\_final_ | _Flag for marking the final state_ |
- |
-| **\_\_init\_\_ (name)** | **Initialize nfa\_state with given name** |
- |
-| NFA |
 | --- |
-| _Start_ | _Start state reference_ |
-| --- | --- |
-| _End_ | _End State reference_ |
-| --- | --- |
-| **\_\_init\_\_ (start, end)** | **Initialize NFA with given start and end reference** |
-| --- | --- |
-| **show\_nfa** | **Prints the contets of NFA** |
-| --- | --- |
-| **pretty print** | **Recursive function for printing** |
-| --- | --- |
+| _epsilon closure - List of state that have epsilon transition_ |
+| _transition table -Dictionary with key being letter and value is nfa state_ |
+| _Name - Name of the state eg. s2_ |
+| _is\_final - Flag for marking the final state_ |
+| _Start - Start state reference_ |
+| _End - End State reference_ |
+| **\_\_init\_\_ (name) - Initialize nfa\_state with given name** |
+| **\_\_init\_\_ (start, end) - Initialize NFA with given start and end reference** |
+| **show\_nfa - Prints the contets of NFA** |
+| **pretty print - Recursive function for printing** |
 
 | NFA Constructor |
 | --- |
-| _constructors_ | _Dictionary holding all functions under the key of token names_ |
-| _state\_count_ | _Counter of states in constructed NFA_ |
-| **nfa\_stack** | **A stack holding all constructed NFA** |
-| **construct\_state** | **Returns constructed state with name taken form state count eg. s6** |
-| **construct\_char** | **Creates two states adds transition to start and pushes created nfa onto the stack** |
-| **construc\_concat** | **Pops two nfa&#39;s and adds epsilon transition between end of the first and start of the second** |
-| **construct\_union** | **Pop two nfa&#39;s, create two states, add eps transiton from state1 to nfa&#39;s start and connect end&#39;s of nfa&#39;s with second state. Construct nfa from given states and push it onto the stack.** |
-| **construct\_star** | **Pop nfa form stack create two states and add appropriate eps transitions, create nfa and push it onto the stack** |
-| **construct\_nfa** | **Create nfa based on the token list, assert the stack is of length 1 if so pop first element** |
+| _Constructors - Dictionary holding all functions under the key of token names_ |
+| _State\_count - Counter of states in constructed NFA_ |
+| **Nfa\_stack - A stack holding all constructed NFA** |
+| **Construct\_state - Returns constructed state with name taken form state count eg. s6** |
+| **Construct\_char - Creates two states adds transition to start and pushes created nfa onto the stack** |
+| **Construc\_concat - Pops two nfa&#39;s and adds epsilon transition between end of the first and start of the second** |
+| **Construct\_union - Pop two nfa&#39;s, create two states, add eps transiton from state1 to nfa&#39;s start and connect end&#39;s of nfa&#39;s with second state. Construct nfa from given states and push it onto the stack.** |
+| **Construct\_star - Pop nfa form stack create two states and add appropriate eps transitions, create nfa and push it onto the stack** |
+| **Construct\_nfa - Create nfa based on the token list, assert the stack is of length 1 if so pop first element** |
 
 DFA
 
 | DFA State |
 | --- |
-| _nfa states_ | _List of nfa states inside the dfa state_ |
-| _transition table_ | _Dictionary with key being letter and value is dfa state_ |
-| _name_ | _Name of the state eg. s2_ |
-| _is\_final_ | _Flag for marking the final state_ |
-| **\_\_init\_\_ (name)** | **Initialize dfa\_state with given name** |
+| _Nfa states - List of nfa states inside the dfa state_ |
+| _Transition table - Dictionary with key being letter and value is dfa state_ |
+| _Name - Name of the state eg. s2_ |
+| _Is\_final - Flag for marking the final state_ |
+| **\_\_init\_\_ (name) - Initialize dfa\_state with given name** |
 
 | DFA |
 | --- |
-| _states_ | _List of DFA states_ |
-| **\_\_init\_\_** | **Initialize DFA** |
-| **check\_state(given\_states)** | **Take list of NFA states and return corresponding DFA state if it exists** |
-| **walk\_dfa(word)** | **Perform a walk over DFA with a given word if it works on DFA then return True** |
-| **show\_dfa** | **Print DFA** |
-| **pretty\_print** | **Recursive Printing** |
+| _States - List of DFA states_ |
+| **\_\_init\_\_ - Initialize DFA** |
+| **check\_state(given\_states) - Take list of NFA states and return corresponding DFA state if it exists** |
+| **walk\_dfa(word) - Perform a walk over DFA with a given word if it works on DFA then return True** |
+| **show\_dfa - Print DFA** |
+| **pretty\_print - Recursive Printing** |
 
 | DFA Constructor |
 | --- |
-| _alphabet_ | _List of all characters defined in alphabet_ |
-| _state\_count_ | _Counter of states in constructed NFA_ |
-| **\_\_init\_\_** | **Initialize DFA constructor** |
-| **construct\_state** | **Returns constructed state with name taken form state count eg. DFA\_s6** |
-| **eps\_closure(states)** | **Perform epsilon closure on the list of states** |
-| **move** | **With a given state and letter performe move operation** |
-| **construct\_dfa** | **Create DFA and DFA state, perform eps closure on it and add it to list of states. For every state in list of states, perform move function for entire alphabet and then eps closure on this move function result. If the states with the resulting list exists add transition if not create such state and add transition.** |
+| _Alphabet - List of all characters defined in alphabet_ |
+| _State\_count - Counter of states in constructed NFA_ |
+| **\_\_init\_\_ - Initialize DFA constructor** |
+| **Construct\_state - Returns constructed state with name taken form state count eg. DFA\_s6** |
+| **Eps\_closure(states) - Perform epsilon closure on the list of states** |
+| **Move - With a given state and letter performe move operation** |
+| **Construct\_dfa - Create DFA and DFA state, perform eps closure on it and add it to list of states. For every state in list of states, perform move function for entire alphabet and then eps closure on this move function result. If the states with the resulting list exists add transition if not create such state and add transition.** |
 
 # Execution of the program
 
@@ -134,24 +114,6 @@ To execute this program we need to do certain steps:
 4. Construct NFA form a token list given from the parser
 5. Construct DFA from a nfa constructed by NFA Constructor
 6. We can now perform a walk over DFA with given string
-
-Exemplary code:
-
-regexp = &quot;a|b\*&quot;
-
-    my\_scan = Scanner(regexp)
-
-    my\_parser = Parser(my\_scan)
-
-    my\_parser.parse()
-
-    nfa\_construct = NFA\_Constructor()
-
-    my\_nfa = nfa\_construct.construct\_nfa(my\_parser.token\_list)
-
-    dfa\_construct = DFA\_Constructor()
-
-    my\_dfa = dfa\_construct.construct\_dfa(my\_nfa)
 
 # Functional test cases
 
@@ -172,6 +134,7 @@ Expected output: (False, False, True, False, False)
 Expected output: (False, False, True)
 
 - Regex: 01(&#39;=34567) Expected Result: ParseError detection!
+
 - Regex: (\*) Expected pattern: ε Input: a, 4, 2656, Owsekb, ε
 
 Expected output: (False, False, False, True)
