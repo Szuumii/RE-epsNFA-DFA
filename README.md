@@ -14,10 +14,11 @@ There are two inputs in my program. First one is the regular expression that use
 
 Algorithm itself consists of several parts. In the first phase we separate characters into a groups of tokens. There are two type of tokens: letter which stands for input alphabet and symbol which represents special symbols used to describe regular expression. Each token has two fields: name and value. Scanner scans through a given regular expression and every time it&#39;s required it returns the next token on the input. Main part of this phase is Parser which creates token table that represents given regexp. This part is crucial because NFA and DFA will be constructed based on this table. Phase two creates the NFA using appropriate constructors defined in NFA\_constructor class. The last part of this algorithm is to create DFA form a given ε-NFA which we do by defining ε-closure and move function. In the end we validate our input string with walk() function to check if given regexp is accepting our input string.
 
-Parsing
+**Parsing**
 
-| _Name - Name of the token eg. CHAR or LEFT\_PAREN_ |
+| Token |
 | --- |
+| _Name - Name of the token eg. CHAR or LEFT\_PAREN_ |
 | _Value -_ _Value of the token eg. a or (_ |
 | **\_\_init\_\_ - Init method** |
 | **\_\_str\_\_ - Conjunction of name and value of a token eg. CHAR: a** |
@@ -48,7 +49,7 @@ Parsing
 
 It&#39;s worth explaining here how the parser structure works. If we want to begging parsing process we have to call parse() function. It starts the entire cycle of creating token list in something similar to Reverse Polish Notation. Firstly diving down into functions the character or parenthesis is checked. If found then we add it to token list. First return from the check\_char function looks for kleen&#39;s closure appering after the character or right parenthesis. If found then we add it after character in token list if not then we proceed with return. Next one in line is concatenation. Last thing we look for is union character. If we won&#39;t find any of the mentioned above we return the token list. If we find some appropriate symbol we start our dive again.
 
-ε-NFA
+**ε-NFA**
 
 | NFA State |
 | --- |
@@ -75,7 +76,7 @@ It&#39;s worth explaining here how the parser structure works. If we want to beg
 | **Construct\_star - Pop nfa form stack create two states and add appropriate eps transitions, create nfa and push it onto the stack** |
 | **Construct\_nfa - Create nfa based on the token list, assert the stack is of length 1 if so pop first element** |
 
-DFA
+**DFA**
 
 | DFA State |
 | --- |
